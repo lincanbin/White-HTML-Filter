@@ -1,0 +1,25 @@
+{
+    "name": "lincanbin/white-html-filter",
+    "keywords": [
+        "xss",
+        "filter",
+        "html",
+        "whitelist"
+    ],
+    "description": "A lightweight php-based HTML tag and attribute whitelist filter.",
+    "license": "Apache License Version 2.0",
+    "authors": [
+        {
+            "name": "lincanbin",
+            "email": "lincanbin@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "lincanbin\\": "src/"
+        }
+    }
+}
