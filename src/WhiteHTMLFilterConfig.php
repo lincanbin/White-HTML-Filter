@@ -77,7 +77,7 @@ class WhiteHTMLFilterConfig
     public function removeFromTagWhiteList($tagName)
     {
         if (is_string($tagName)) {
-            $tagName = [$tagName];
+            $tagName = array($tagName);
         }
         foreach ($tagName as $val) {
             if (array_key_exists($val, $tagName)) {
