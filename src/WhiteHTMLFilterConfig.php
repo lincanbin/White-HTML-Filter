@@ -17,12 +17,12 @@ class WhiteHTMLFilterConfig
         "img" => array("alt", "src", "height", "width"),
         "a" => array("href", "rel", "target", "download", "type"),
         "div" => array(),
-        "table" => array(),
+        "table" => array("sortable", "width"),
         "tbody" => array(),
         "caption" => array(),
         "tr" => array(),
-        "td" => array(),
-        "th" => array(),
+        "td" => array("valign", "colspan", "rowspan"),
+        "th" => array("width"),
         "br" => array(),
         "p" => array(),
         "b" => array(),
@@ -33,11 +33,11 @@ class WhiteHTMLFilterConfig
         "span" => array(),
         "ol" => array(),
         "ul" => array(),
-        "li" => array(),
-        "blockquote" => array(),
-        "object" => array(),
-        "param" => array(),
-        "embed" => array(),
+        "li" => array("value"),
+        "blockquote" => array("cite"),
+        //"object" => array(),
+        //"param" => array(),
+        "embed" => array("type", "pluginspage", "src", "width", "height", "wmode", "play", "loop", "menu", "allowscriptaccess", "allowfullscreen"),
         "pre" => array(),
         "hr" => array(),
         "h1" => array(),
@@ -46,11 +46,14 @@ class WhiteHTMLFilterConfig
         "h4" => array(),
         "h5" => array(),
         "h6" => array(),
-        "video" => array(),
-        "source" => array(),
-        "audio" => array()
+        "video" => array("autoplay", "controls", "height", "loop", "muted", "poster", "preload", "src", "width"),
+        "source" => array("src", "srcset", "media", "sizes", "type"),
+        "audio" => array("autoplay", "controls", "loop", "muted", "preload", "src")
     );
 
+    public $WhiteListHtmlGlobalAttributes = array(
+        "class", "style", "title", "data-*"
+    );
     public $WhiteListStyle = array();
 
     /**
