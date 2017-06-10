@@ -17,7 +17,7 @@ $html = <<<html
 		test中文
 	</span>
 </div>
-<div class="contain">
+<div class="contain" data-src="xxx" onclick="javascript:alert('xxx');">
 	<audio controls = "play">
 	  <source src="horse.ogg" type="audio/ogg">
 	  <source src="horse.mp3" type="audio/mpeg">
@@ -35,8 +35,10 @@ $filter = new WhiteHTMLFilter();
 $filter->loadHTML($html);
 
 $removedNodes = $filter->clean();
-echo "\n\nremoved nodes\n\n";
+echo "\n\nremoved nodes: \n";
 foreach ($removedNodes as $elem) {
     var_dump($elem->nodeName);
 }
+
+echo "\n\n\n";
 var_dump($filter->outputHtml());
