@@ -76,11 +76,14 @@ class WhiteHTMLFilter
         $tagName = strtolower($elem->nodeName);
         $attrs = $elem->attributes;
         $index = $attrs->length;
+        $attrsWhiteList = array_merge($this->config->getWhiteListAttr($tagName), $this->config->WhiteListHtmlGlobalAttributes);
+        $allowDataAttribute = in_array("data-*", $attrsWhiteList);
         while (--$index >= 0) {
             /* @var $domAttr \DOMAttr */
             $domAttr = $attrs->item($index);
             $attrName = strtolower($domAttr->name);
-            if (!in_array($attrName, $this->config->getWhiteListAttr($tagName))) {
+            // 如果不在白名单attr中，而且允许data-*，且不是data-*，则删除
+            if (!in_array($attrName, $attrsWhiteList) && $allowDataAttribute && (stripos($attrName, "data-") !== 0)) {
                 $elem->removeAttribute($attrName);
             }
         }
@@ -97,7 +100,7 @@ class WhiteHTMLFilter
     {
         //var_dump($elem->nodeName);
         $removed = array();
-        if ($isFirstNode || $elem->nodeType !== XML_PI_NODE && array_key_exists(strtolower($elem->nodeName), $this->config->WhiteListTag)) {
+        if ($isFirstNode || array_key_exists(strtolower($elem->nodeName), $this->config->WhiteListTag)) {
             if ($elem->hasAttributes()) {
                 $this->cleanAttrs($elem);
             }
