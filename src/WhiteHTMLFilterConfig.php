@@ -66,7 +66,7 @@ class WhiteHTMLFilterConfig
         if (!empty($this->WhiteListTag[$tagName])) {
             return $this->WhiteListTag[$tagName];
         }
-        return [];
+        return array();
     }
 
     public function removeAllAllowTag()
