@@ -24,8 +24,8 @@ $html = <<<html
 	  Your browser does not support the audio element.
 	</audio>
 </div>
-<div class="contain">
-	<span style="color: #f00;" class="aabc">test</span>
+<div class="contain sider float-right">
+	<span style="color: #f00;font-size: 19px;" class="aabc">test</span>
 </div>
 <IMG SRC=javascript:alert('XSS')>
 html;
@@ -33,6 +33,8 @@ html;
 //$html = file_get_contents("http://php.net/manual/en/function.strip-tags.php");
 $filter = new WhiteHTMLFilter();
 $filter->loadHTML($html);
+$filter->config->WhiteListStyle = array('color');
+$filter->config->WhiteListCssClass = array('contain', 'sider');
 
 $removedNodes = $filter->clean();
 echo "\n\nremoved nodes: \n";

@@ -9,6 +9,7 @@ namespace lincanbin;
 
 use \DOMDocument;
 use \DOMElement;
+use \DOMAttr;
 use \Exception;
 
 
@@ -23,6 +24,9 @@ class WhiteHTMLFilter
 
     public function __construct()
     {
+        if (extension_loaded("dom") === false) {
+            throw new Exception('DOM extension is required. http://php.net/manual/en/dom.installation.php');
+        }
         $this->config = new WhiteHTMLFilterConfig();
 
         if (!$this->dom) {
@@ -84,13 +88,40 @@ class WhiteHTMLFilter
         $attrsWhiteList = array_merge($this->config->getWhiteListAttr($tagName), $this->config->WhiteListHtmlGlobalAttributes);
         $allowDataAttribute = in_array("data-*", $attrsWhiteList);
         while (--$index >= 0) {
-            /* @var $domAttr \DOMAttr */
+            /* @var $domAttr DOMAttr */
             $domAttr = $attrs->item($index);
             $attrName = strtolower($domAttr->name);
             // 如果不在白名单attr中，而且允许data-*，且不是data-*，则删除
             if (!in_array($attrName, $attrsWhiteList) && $allowDataAttribute && (stripos($attrName, "data-") !== 0)) {
                 $elem->removeAttribute($attrName);
+            } else {
+                $this->cleanAttrValue($domAttr);
             }
+        }
+    }
+
+    private function cleanAttrValue(DOMAttr $domAttr)
+    {
+        $attrName = strtolower($domAttr->name);
+        if ($attrName === 'style' && !empty($this->config->WhiteListStyle)) {
+            $styles = explode(';', $domAttr->value);
+            foreach ($styles as $key => &$subStyle) {
+                $subStyle = array_map("trim", explode(':', strtolower($subStyle), 2));
+                if (empty($subStyle[0]) || !in_array($subStyle[0], $this->config->WhiteListStyle)) {
+                    unset($styles[$key]);
+                }
+            }
+            $implodeFunc = function ($styleSheet) {
+                return implode(':', $styleSheet);
+            };
+            $domAttr->value = implode(';', array_map($implodeFunc, $styles)) . ';';
+
+        }
+        if ($attrName === 'class' && !empty($this->config->WhiteListCssClass)) {
+            $domAttr->value = implode(' ', array_intersect(preg_split('/\s+/', $domAttr->value), $this->config->WhiteListCssClass));
+        }
+        if ($attrName === 'src' || $attrName === 'href') {
+            $domAttr->value = filter_var($domAttr->value, FILTER_SANITIZE_URL);
         }
     }
 
@@ -103,7 +134,6 @@ class WhiteHTMLFilter
      */
     private function cleanNodes(DOMElement $elem, $isFirstNode = false)
     {
-        //var_dump($elem->nodeName);
         $removed = array();
         if ($isFirstNode || array_key_exists(strtolower($elem->nodeName), $this->config->WhiteListTag)) {
             if ($elem->hasAttributes()) {

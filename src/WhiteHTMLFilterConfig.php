@@ -55,7 +55,7 @@ class WhiteHTMLFilterConfig
         "class", "style", "title", "data-*"
     );
     public $WhiteListStyle = array();
-
+    public $WhiteListCssClass = array();
     /**
      * Get attributes whitelist of some tag
      * @param string $tagName Tag name
@@ -71,7 +71,11 @@ class WhiteHTMLFilterConfig
 
     public function removeAllAllowTag()
     {
-        $this->WhiteListTag = array();
+        $this->WhiteListTag = array(
+            "#cdata-section" => array(),
+            "#comment" => array(),
+            "#text" => array(),
+        );
     }
 
     public function removeFromTagWhiteList($tagName)
