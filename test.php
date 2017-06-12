@@ -52,14 +52,8 @@ $filter->config->WhiteListCssClass = array('contain', 'sider');
 
 
 //No filter
-if (version_compare(PHP_VERSION, '5.4.0') < 0) {
-    // PHP 5.3.0
-    test(
-        '<div class="contain"><span style="color: #f00;"><p>test中文</p>
-<br>line2</span></div>',
-        '<div class="contain"><span style="color:#f00;"><p>test中文</p>
-<br>line2</span></div>');
-} else {
+// PHP 5.4+
+if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
     test(
         '<div class="contain"><span style="color: #f00;"><p>test中文</p>
 <br/>line2</span></div>',
