@@ -32,8 +32,8 @@ class WhiteHTMLFilter
         if (!$this->dom) {
             $this->dom = new DOMDocument();
         }
-        $this->dom->preserveWhiteSpace = false;
-        $this->dom->formatOutput = true;
+        $this->dom->preserveWhiteSpace = true;
+        $this->dom->formatOutput = false;
         $this->dom->encoding = 'UTF-8';
         //Disable libxml errors
         libxml_use_internal_errors(true);
@@ -73,7 +73,9 @@ class WhiteHTMLFilter
                 return '<' . $tagName . '>';
             };
             $allowTagsString = implode('', array_map($GenerateTag, array_keys($this->config->WhiteListTag)));
-            $result = trim($this->dom->saveHTML());
+            //SaveXML : <br/><img/>
+            //SaveHTML: <br><img>
+            $result = trim($this->dom->saveXML());
             $result = mb_convert_encoding($result, "UTF-8", 'HTML-ENTITIES');
             $result = strip_tags($result, $allowTagsString);
         }

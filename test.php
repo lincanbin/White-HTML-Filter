@@ -34,7 +34,7 @@ function test($input, $assert)
         var_dump($elem->nodeName);
     }
 
-    if (str_replace("\n", "", $result) === str_replace("\n", "", $assert)) {
+    if (str_replace("    ", "", str_replace("\n", "", $result)) === str_replace("\n", "", $assert)) {
         echo "\n\033[32m passed $timeCost ms\033[0m\n";
         $Passed++;
     } else {
@@ -51,13 +51,12 @@ $filter->config->WhiteListStyle = array('color');
 $filter->config->WhiteListCssClass = array('contain', 'sider');
 
 
-
 //No filter
 test(
     '<div class="contain"><span style="color: #f00;"><p>test中文</p>
-<br>line2</span></div>',
+<br/>line2</span></div>',
     '<div class="contain"><span style="color:#f00;"><p>test中文</p>
-<br>line2</span></div>');
+<br/>line2</span></div>');
 
 
 //Tag filter
@@ -66,8 +65,12 @@ test(
     ''
 );
 test(
+    '<img src="http://127.0.0.1/upload/donate_small.png" width="251" height="250" />',
+    '<img src="http://127.0.0.1/upload/donate_small.png" width="251" height="250"/>'
+);
+test(
     '<IMG SRC=javascript:alert(\'XSS\')>',
-    '<img src="">'
+    '<img src=""/>'
 );
 
 //Unclosed tag filter
@@ -89,7 +92,8 @@ Your browser does not support the audio element.
 </div>',
     '<div class="contain" data-src="xxx">
 <audio controls="play">
-<source src="horse.ogg" type="audio/ogg"></source><source src="horse.mp3" type="audio/mpeg"></source>
+<source src="horse.ogg" type="audio/ogg"/>
+<source src="horse.mp3" type="audio/mpeg"/>
 Your browser does not support the audio element.
 </audio>
 </div>'
@@ -98,8 +102,8 @@ Your browser does not support the audio element.
 
 //CSS classes filter
 test(
-    '<div class="contain sider float-right"></div>',
-    '<div class="contain sider"></div>'
+    '<div class="contain sider float-right">right</div>',
+    '<div class="contain sider">right</div>'
 );
 
 
@@ -111,10 +115,9 @@ test(
 
 //Url filter
 test(
-    '<a href="JavaScript:alert("xss");">',
-    '<a href=""></a>'
+    '<a href="JavaScript:alert("xss");">link</a>',
+    '<a href="">link</a>'
 );
-
 
 
 echo "\n\n\033[32m $Passed passed \033[0m\n\n";
