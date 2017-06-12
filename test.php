@@ -10,37 +10,119 @@ use lincanbin\WhiteHTMLFilter;
 require(__DIR__ . '/src/WhiteHTMLFilter.php');
 require(__DIR__ . '/src/WhiteHTMLFilterConfig.php');
 
-$html = <<<html
-<iframe></iframe>
-<div class="contain">
-	<span style="color: #f00;">
-		test中文
-	</span>
-</div>
-<div class="contain" data-src="xxx" onclick="javascript:alert('xxx');">
-	<audio controls = "play">
-	  <source src="horse.ogg" type="audio/ogg">
-	  <source src="horse.mp3" type="audio/mpeg">
-	  Your browser does not support the audio element.
-	</audio>
-</div>
-<div class="contain sider float-right">
-	<span style="color: #f00;font-size: 19px;" class="aabc">test</span>
-</div>
-<IMG SRC=javascript:alert('XSS')>
-html;
 
-//$html = file_get_contents("http://php.net/manual/en/function.strip-tags.php");
+function test($input, $assert)
+{
+    global $filter, $Passed, $Failed;
+    echo "\n\033[33m -------------------------------------------------------- \033[0m\n";
+    $filter->loadHTML($input);
+    $removedNodes = $filter->clean();
+    $result = $filter->outputHtml();
+
+    echo "\ninput:             ";
+    var_dump($input);
+
+    echo "\nassert:            ";
+    var_dump($assert);
+
+    echo "\nresult:            ";
+    var_dump($result);
+
+    echo "\n\nremoved nodes: \n";
+    foreach ($removedNodes as $elem) {
+        var_dump($elem->nodeName);
+    }
+
+    if ($result === $assert) {
+        echo "\n\033[32m passed\033[0m\n";
+        $Passed++;
+    } else {
+        echo "\n\033[31m failed\033[0m\n";
+        $Failed++;
+    }
+    echo "\n\033[33m -------------------------------------------------------- \033[0m\n\n\n\n";
+}
+
+$Passed = 0;
+$Failed = 0;
 $filter = new WhiteHTMLFilter();
-$filter->loadHTML($html);
 $filter->config->WhiteListStyle = array('color');
 $filter->config->WhiteListCssClass = array('contain', 'sider');
 
-$removedNodes = $filter->clean();
-echo "\n\nremoved nodes: \n";
-foreach ($removedNodes as $elem) {
-    var_dump($elem->nodeName);
-}
 
-echo "\n\n\n";
-var_dump($filter->outputHtml());
+
+//No filter
+test(
+    '<div class="contain"><span style="color: #f00;"><p>test中文</p>
+<br>line2</span></div>',
+    '<div class="contain"><span style="color:#f00;"><p>test中文</p>
+<br>line2</span></div>');
+
+
+//Tag filter
+test(
+    '<iframe></iframe>',
+    ''
+);
+test(
+    '<IMG SRC=javascript:alert(\'XSS\')>',
+    '<img src="">'
+);
+
+//Unclosed tag filter
+test(
+    '<div>xxxx</div><div>dddd',
+    '
+<div>xxxx</div>
+<div>dddd</div>
+'
+);
+
+//attributes filter
+test(
+    '<div class="contain" data-src="xxx" onclick="javascript:alert(\'xxx\');">
+    <audio controls = "play">
+      <source src="horse.ogg" type="audio/ogg" />
+      <source src="horse.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+</div>',
+    '<div class="contain" data-src="xxx">
+    <audio controls="play">
+      <source src="horse.ogg" type="audio/ogg"></source>
+      <source src="horse.mp3" type="audio/mpeg"></source>
+      Your browser does not support the audio element.
+    </audio>
+</div>'
+);
+
+
+//CSS classes filter
+test(
+    '<div class="contain sider float-right"></div>',
+    '<div class="contain sider"></div>'
+);
+
+
+//CSS styles filter
+test(
+    '<span style="color: #f00;font-size: 19px;float:right;" class="aabc">test</span>',
+    '<span style="color:#f00;" class="">test</span>'
+);
+
+//Url filter
+test(
+    '<a href="JavaScript:alert("xss");">',
+    '<a href=""></a>'
+);
+
+
+
+echo "\n\n\033[32m $Passed passed \033[0m\n\n";
+
+if ($Failed === 0) {
+    exit(0);
+} else {
+    echo "\033[31m $Failed failed \033[0m\n\n";
+    exit(1);
+}
