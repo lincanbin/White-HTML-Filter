@@ -33,7 +33,7 @@ function test($input, $assert)
         var_dump($elem->nodeName);
     }
 
-    if ($result === $assert) {
+    if (str_replace("\n", "", $result) === str_replace("\n", "", $assert)) {
         echo "\n\033[32m passed\033[0m\n";
         $Passed++;
     } else {
