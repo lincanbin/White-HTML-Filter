@@ -121,7 +121,11 @@ class WhiteHTMLFilter
             $domAttr->value = implode(' ', array_intersect(preg_split('/\s+/', $domAttr->value), $this->config->WhiteListCssClass));
         }
         if ($attrName === 'src' || $attrName === 'href') {
-            $domAttr->value = filter_var($domAttr->value, FILTER_SANITIZE_URL);
+            if (strtolower(parse_url($domAttr->value, PHP_URL_SCHEME)) === 'javascript') {
+                $domAttr->value = '';
+            } else {
+                $domAttr->value = filter_var($domAttr->value, FILTER_SANITIZE_URL);
+            }
         }
     }
 
