@@ -15,10 +15,11 @@ function test($input, $assert)
 {
     global $filter, $Passed, $Failed;
     echo "\n\033[33m -------------------------------------------------------- \033[0m\n";
+    $startTime = microtime(true);
     $filter->loadHTML($input);
     $removedNodes = $filter->clean();
     $result = $filter->outputHtml();
-
+    $timeCost = number_format((microtime(true) - $startTime) * 1000, 3);
     echo "\ninput:             ";
     var_dump($input);
 
@@ -34,10 +35,10 @@ function test($input, $assert)
     }
 
     if (str_replace("\n", "", $result) === str_replace("\n", "", $assert)) {
-        echo "\n\033[32m passed\033[0m\n";
+        echo "\n\033[32m passed $timeCost ms\033[0m\n";
         $Passed++;
     } else {
-        echo "\n\033[31m failed\033[0m\n";
+        echo "\n\033[31m failed $timeCost ms\033[0m\n";
         $Failed++;
     }
     echo "\n\033[33m -------------------------------------------------------- \033[0m\n\n\n\n";
