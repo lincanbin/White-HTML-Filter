@@ -2,6 +2,7 @@
 
 A php-based HTML tag and attribute whitelist filter. 
 
+XSS filtering based on regular or textual replacement is not safe. This filter uses the DOMDocument based on `The Tokenization Algorithm`, which is more secure.
 
 ## Requirements
 
