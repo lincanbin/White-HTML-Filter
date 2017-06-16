@@ -157,12 +157,11 @@ class WhiteHTMLFilter
                     if ($cleanNode instanceof DOMElement) {
                         $removed = array_merge($removed, $this->cleanNodes($cleanNode));
                     }
-
                 }
             }
         } else {
             if ($elem->parentNode->removeChild($elem)) {
-                $removed [] = $elem;
+                $removed[] = $elem;
             } else {
                 throw new Exception('Failed to remove node from DOM');
             }

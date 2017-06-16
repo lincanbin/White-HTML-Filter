@@ -13,7 +13,7 @@ require(__DIR__ . '/src/WhiteHTMLFilterConfig.php');
 
 function test($input, $assert)
 {
-    global $filter, $Passed, $Failed;
+    global $filter, $passed, $failed;
     echo "\n\033[33m -------------------------------------------------------- \033[0m\n";
     $startTime = microtime(true);
     $filter->loadHTML($input);
@@ -36,16 +36,16 @@ function test($input, $assert)
 
     if (str_replace("    ", "", str_replace("\n", "", $result)) === str_replace("\n", "", $assert)) {
         echo "\n\033[32m passed $timeCost ms\033[0m\n";
-        $Passed++;
+        $passed++;
     } else {
         echo "\n\033[31m failed $timeCost ms\033[0m\n";
-        $Failed++;
+        $failed++;
     }
     echo "\n\033[33m -------------------------------------------------------- \033[0m\n\n\n\n";
 }
 
-$Passed = 0;
-$Failed = 0;
+$passed = 0;
+$failed = 0;
 $filter = new WhiteHTMLFilter();
 $filter->config->WhiteListStyle = array('color');
 $filter->config->WhiteListCssClass = array('contain', 'sider');
@@ -125,11 +125,11 @@ test(
 );
 
 
-echo "\n\n\033[32m $Passed passed \033[0m\n\n";
+echo "\n\n\033[32m $passed passed \033[0m\n\n";
 
-if ($Failed === 0) {
+if ($failed === 0) {
     exit(0);
 } else {
-    echo "\033[31m $Failed failed \033[0m\n\n";
+    echo "\033[31m $failed failed \033[0m\n\n";
     exit(1);
 }
