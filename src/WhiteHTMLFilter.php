@@ -95,7 +95,7 @@ class WhiteHTMLFilter
         $tagName = strtolower($elem->nodeName);
         $attributes = $elem->attributes;
         $attributesWhiteList = $this->config->WhiteListHtmlGlobalAttributes;
-        $attributesFilterMap = [];
+        $attributesFilterMap = array();
         $allowDataAttribute = in_array("data-*", $attributesWhiteList);
         $whiteListAttr = $this->config->getWhiteListAttr($tagName);
         foreach ($whiteListAttr as $key => $val) {
