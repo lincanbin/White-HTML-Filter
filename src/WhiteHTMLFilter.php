@@ -200,7 +200,7 @@ class WhiteHTMLFilter
             }
         } else {
             $textContent = $elem->textContent;
-            if ($this->isValidText($textContent)) {
+            if ($this->config->KeepText === true && $this->isValidText($textContent)) {
                 $result = $elem->parentNode->replaceChild($this->dom->createTextNode($textContent), $elem);
             } else {
                 $result = $elem->parentNode->removeChild($elem);
@@ -221,7 +221,7 @@ class WhiteHTMLFilter
     public function clean()
     {
         $elem = $this->dom->getElementsByTagName('body')->item(0);
-        if(is_null($elem)) {
+        if (is_null($elem)) {
             return array();
         }
         return $this->cleanNodes($elem, true);
