@@ -11,45 +11,33 @@ require(__DIR__ . '/src/WhiteHTMLFilter.php');
 require(__DIR__ . '/src/WhiteHTMLFilterConfig.php');
 
 
-function test($input, $assert)
-{
-    global $filter, $passed, $failed;
-    echo "\n\033[33m -------------------------------------------------------- \033[0m\n";
-    $startTime = microtime(true);
-    $filter->loadHTML($input);
-    $removedNodes = $filter->clean();
-    $result = $filter->outputHtml();
-    $timeCost = number_format((microtime(true) - $startTime) * 1000, 3);
-    echo "\ninput:             ";
-    var_dump($input);
-
-    echo "\nassert:            ";
-    var_dump($assert);
-
-    echo "\nresult:            ";
-    var_dump($result);
-
-    echo "\n\nremoved nodes: \n";
-    foreach ($removedNodes as $elem) {
-        var_dump($elem->nodeName);
-    }
-
-    if (str_replace("    ", "", str_replace("\n", "", $result)) === str_replace("\n", "", $assert)) {
-        echo "\n\033[32m passed $timeCost ms\033[0m\n";
-        $passed++;
-    } else {
-        echo "\n\033[31m failed $timeCost ms\033[0m\n";
-        $failed++;
-    }
-    echo "\n\033[33m -------------------------------------------------------- \033[0m\n\n\n\n";
-}
-
 $passed = 0;
 $failed = 0;
 $filter = new WhiteHTMLFilter();
 $filter->config->WhiteListStyle = array('color');
 $filter->config->WhiteListCssClass = array('contain', 'sider');
+$urlFilter = function($url) {
+    $rx = '~
+  ^(?:https?://)?                           # Optional protocol
+   (?:www[.])?                              # Optional sub-domain
+   (?:youtube[.]com/embed/|youtu[.]be/) # Mandatory domain name (w/ query string in .com)
+   ([^&]{11})                               # Video id of 11 characters as capture group 1
+    ~x';
+    return (preg_match($rx, $url) === 1) ? $url : '';
+};
 
+$iframeRule = array(
+    'iframe' => array(
+        'src' => $urlFilter,
+        'width',
+        'height',
+        'frameborder',
+        'allowfullscreen'
+    )
+);
+$filter->config->removeFromTagWhiteList('table');
+$filter->config->removeFromTagWhiteList(array('tr', 'th', 'td'));
+$filter->config->modifyTagWhiteList($iframeRule);
 
 //No filter
 // PHP 5.4+
@@ -62,11 +50,21 @@ if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
 }
 
 
+//User filer
+test(
+    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen></iframe>',
+    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen=""/>'
+);
 
+//User filer
+test(
+    '<iframe width="560" height="315" src="https://www.94cb.com/" frameborder="0" allowfullscreen></iframe>',
+    '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen=""/>'
+);
 
 //Tag filter
 test(
-    '<iframe></iframe>',
+    '<script type="text/javascript" charset="utf-8" src="/static/js/jquery.js"></script>',
     ''
 );
 test(
@@ -137,4 +135,37 @@ if ($failed === 0) {
 } else {
     echo "\033[31m $failed failed \033[0m\n\n";
     exit(1);
+}
+
+function test($input, $assert)
+{
+    global $filter, $passed, $failed;
+    echo "\n\033[33m -------------------------------------------------------- \033[0m\n";
+    $startTime = microtime(true);
+    $filter->loadHTML($input);
+    $removedNodes = $filter->clean();
+    $result = $filter->outputHtml();
+    $timeCost = number_format((microtime(true) - $startTime) * 1000, 3);
+    echo "\ninput:             ";
+    var_dump($input);
+
+    echo "\nassert:            ";
+    var_dump($assert);
+
+    echo "\nresult:            ";
+    var_dump($result);
+
+    echo "\n\nremoved nodes: \n";
+    foreach ($removedNodes as $elem) {
+        var_dump($elem->nodeName);
+    }
+
+    if (str_replace("    ", "", str_replace("\n", "", $result)) === str_replace("\n", "", $assert)) {
+        echo "\n\033[32m passed $timeCost ms\033[0m\n";
+        $passed++;
+    } else {
+        echo "\n\033[31m failed $timeCost ms\033[0m\n";
+        $failed++;
+    }
+    echo "\n\033[33m -------------------------------------------------------- \033[0m\n\n\n\n";
 }

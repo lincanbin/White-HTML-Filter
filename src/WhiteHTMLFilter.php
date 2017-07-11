@@ -11,7 +11,7 @@ use \DOMDocument;
 use \DOMElement;
 use \DOMAttr;
 use \Exception;
-
+use \Closure;
 
 /**
  * @property WhiteHTMLFilterConfig config
@@ -73,10 +73,10 @@ class WhiteHTMLFilter
     {
         $result = '';
         if (!is_null($this->dom)) {
-            $GenerateTag = function ($tagName) {
+            $generateTag = function ($tagName) {
                 return '<' . $tagName . '>';
             };
-            $allowTagsString = implode('', array_map($GenerateTag, array_keys($this->config->WhiteListTag)));
+            $allowTagsString = implode('', array_map($generateTag, array_keys($this->config->WhiteListTag)));
             //SaveXML : <br/><img/>
             //SaveHTML: <br><img>
             $result = trim($this->dom->saveXML());
@@ -94,9 +94,20 @@ class WhiteHTMLFilter
     {
         $tagName = strtolower($elem->nodeName);
         $attributes = $elem->attributes;
-        $index = $attributes->length;
-        $attributesWhiteList = array_merge($this->config->getWhiteListAttr($tagName), $this->config->WhiteListHtmlGlobalAttributes);
+        $attributesWhiteList = $this->config->WhiteListHtmlGlobalAttributes;
+        $attributesFilterMap = [];
         $allowDataAttribute = in_array("data-*", $attributesWhiteList);
+        $whiteListAttr = $this->config->getWhiteListAttr($tagName);
+        foreach ($whiteListAttr as $key => $val) {
+            if (is_string($val)) {
+                $attributesWhiteList[] = $val;
+            }
+            if ($val instanceof Closure) {
+                $attributesWhiteList[] = $key;
+                $attributesFilterMap[$key] = $val;
+            }
+        }
+        $index = $attributes->length;
         while (--$index >= 0) {
             /* @var $domAttr DOMAttr */
             $domAttr = $attributes->item($index);
@@ -105,7 +116,11 @@ class WhiteHTMLFilter
             if (!in_array($attrName, $attributesWhiteList) && $allowDataAttribute && (stripos($attrName, "data-") !== 0)) {
                 $elem->removeAttribute($attrName);
             } else {
-                $this->cleanAttrValue($domAttr);
+                if (isset($attributesFilterMap[$attrName])) {
+                    $domAttr->value = $attributesFilterMap[$attrName]($domAttr->value);
+                } else {
+                    $this->cleanAttrValue($domAttr);
+                }
             }
         }
     }
@@ -152,14 +167,7 @@ class WhiteHTMLFilter
     {
         $search = array(" ", "　", "\n", "\r", "\t");
         $replace = array("", "", "", "", "");
-        /*
-         * http://php.net/manual/en/function.empty.php
-         * Prior to PHP 5.5, empty() only supports variables;
-         * anything else will result in a parse error.
-         * In other words, the following will not work: empty(trim($name)). Instead, use trim($name) == false.
-         * */
-        $temp = str_replace($search, $replace, $string);
-        return (empty($temp) === false);
+        return str_replace($search, $replace, $string) !== '';
     }
 
     /**
@@ -212,6 +220,10 @@ class WhiteHTMLFilter
      */
     public function clean()
     {
-        return $this->cleanNodes($this->dom->getElementsByTagName('body')->item(0), true);
+        $elem = $this->dom->getElementsByTagName('body')->item(0);
+        if(is_null($elem)) {
+            return array();
+        }
+        return $this->cleanNodes($elem, true);
     }
 }
