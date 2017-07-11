@@ -121,13 +121,13 @@ $html = <<<html
 html;
 $filter = new WhiteHTMLFilter();
 $urlFilter = function($url) {
-    $rx = '~
+    $regex = '~
   ^(?:https?://)?                           # Optional protocol
    (?:www[.])?                              # Optional sub-domain
    (?:youtube[.]com/embed/|youtu[.]be/) # Mandatory domain name (w/ query string in .com)
    ([^&]{11})                               # Video id of 11 characters as capture group 1
     ~x';
-    return (preg_match($rx, $url) === 1) ? $url : '';
+    return (preg_match($regex, $url) === 1) ? $url : '';
 };
 
 $iframeRule = array(
