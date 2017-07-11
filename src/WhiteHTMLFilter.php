@@ -65,6 +65,10 @@ class WhiteHTMLFilter
 
     }
 
+    /**
+     * Output the result
+     * @return string HTML string
+     */
     public function outputHtml()
     {
         $result = '';
@@ -82,19 +86,23 @@ class WhiteHTMLFilter
         return $result;
     }
 
-    private function cleanAttrs(DOMElement $elem)
+    /**
+     * Clean the attributes of the html tags
+     * @param DOMElement $elem
+     */
+    private function cleanAttributes(DOMElement $elem)
     {
         $tagName = strtolower($elem->nodeName);
-        $attrs = $elem->attributes;
-        $index = $attrs->length;
-        $attrsWhiteList = array_merge($this->config->getWhiteListAttr($tagName), $this->config->WhiteListHtmlGlobalAttributes);
-        $allowDataAttribute = in_array("data-*", $attrsWhiteList);
+        $attributes = $elem->attributes;
+        $index = $attributes->length;
+        $attributesWhiteList = array_merge($this->config->getWhiteListAttr($tagName), $this->config->WhiteListHtmlGlobalAttributes);
+        $allowDataAttribute = in_array("data-*", $attributesWhiteList);
         while (--$index >= 0) {
             /* @var $domAttr DOMAttr */
-            $domAttr = $attrs->item($index);
+            $domAttr = $attributes->item($index);
             $attrName = strtolower($domAttr->name);
             // 如果不在白名单attr中，而且允许data-*，且不是data-*，则删除
-            if (!in_array($attrName, $attrsWhiteList) && $allowDataAttribute && (stripos($attrName, "data-") !== 0)) {
+            if (!in_array($attrName, $attributesWhiteList) && $allowDataAttribute && (stripos($attrName, "data-") !== 0)) {
                 $elem->removeAttribute($attrName);
             } else {
                 $this->cleanAttrValue($domAttr);
@@ -102,6 +110,10 @@ class WhiteHTMLFilter
         }
     }
 
+    /**
+     * Clean the value of the attribute
+     * @param DOMAttr $domAttr
+     */
     private function cleanAttrValue(DOMAttr $domAttr)
     {
         $attrName = strtolower($domAttr->name);
@@ -131,11 +143,23 @@ class WhiteHTMLFilter
         }
     }
 
+    /**
+     * Check if there is a valid text in the tag
+     * @param string $string
+     * @return boolean Whether there is valid text
+     */
     private function isValidText($string)
     {
-        $search = array(" ","　","\n","\r","\t");
-        $replace = array("","","","","");
-        return !empty(str_replace($search, $replace, $string));
+        $search = array(" ", "　", "\n", "\r", "\t");
+        $replace = array("", "", "", "", "");
+        /*
+         * http://php.net/manual/en/function.empty.php
+         * Prior to PHP 5.5, empty() only supports variables;
+         * anything else will result in a parse error.
+         * In other words, the following will not work: empty(trim($name)). Instead, use trim($name) == false.
+         * */
+        $temp = str_replace($search, $replace, $string);
+        return (empty($temp) === false);
     }
 
     /**
@@ -150,7 +174,7 @@ class WhiteHTMLFilter
         $removed = array();
         if ($isFirstNode || array_key_exists(strtolower($elem->nodeName), $this->config->WhiteListTag)) {
             if ($elem->hasAttributes()) {
-                $this->cleanAttrs($elem);
+                $this->cleanAttributes($elem);
             }
             /*
              * Iterate over the element's children. The reason we go backwards is because
@@ -184,10 +208,10 @@ class WhiteHTMLFilter
 
     /**
      * Perform the cleaning of the document
+     * @return array List of deleted HTML tags
      */
     public function clean()
     {
-        $removed = $this->cleanNodes($this->dom->getElementsByTagName('body')->item(0), true);
-        return ($removed);
+        return $this->cleanNodes($this->dom->getElementsByTagName('body')->item(0), true);
     }
 }
