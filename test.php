@@ -124,6 +124,11 @@ test(
     '<a href="">link</a>'
 );
 
+//Invalid tag with text content filter
+test(
+    '<div class="form"><form action="login" method="post">username: lincanbin  <button>Login</button></form></div>',
+    '<div class="">username: lincanbin  Login</div>'
+);
 
 echo "\n\n\033[32m $passed passed \033[0m\n\n";
 

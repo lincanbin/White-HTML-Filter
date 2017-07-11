@@ -131,6 +131,13 @@ class WhiteHTMLFilter
         }
     }
 
+    private function isValidText($string)
+    {
+        $search = array(" ","　","\n","\r","\t");
+        $replace = array("","","","","");
+        return !empty(str_replace($search, $replace, $string));
+    }
+
     /**
      * Recursivly remove elements from the DOM that aren't whitelisted
      * @param DOMElement $elem
@@ -160,7 +167,13 @@ class WhiteHTMLFilter
                 }
             }
         } else {
-            if ($elem->parentNode->removeChild($elem)) {
+            $textContent = $elem->textContent;
+            if ($this->isValidText($textContent)) {
+                $result = $elem->parentNode->replaceChild($this->dom->createTextNode($textContent), $elem);
+            } else {
+                $result = $elem->parentNode->removeChild($elem);
+            }
+            if ($result) {
                 $removed[] = $elem;
             } else {
                 throw new Exception('Failed to remove node from DOM');
