@@ -61,7 +61,7 @@ $filter->clean();
 var_dump($filter->outputHtml());
 ```
 
-### Advanced Configuration
+### Configuration
 * Remove allowed tags
 ```php
 use lincanbin\WhiteHTMLFilter;
@@ -108,6 +108,47 @@ $filter = new WhiteHTMLFilter();
 $filter->config->WhiteListCssClass = array(
     "container", "title", "sub-title", "sider-bar"
 );
+```
+
+### Use Custom Filter
+```php
+use lincanbin\WhiteHTMLFilter;
+
+$html = <<<html
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen>
+</iframe>
+<iframe width="560" height="315" src="https://www.94cb.com/" frameborder="0" allowfullscreen></iframe>
+html;
+$filter = new WhiteHTMLFilter();
+$urlFilter = function($url) {
+    $rx = '~
+  ^(?:https?://)?                           # Optional protocol
+   (?:www[.])?                              # Optional sub-domain
+   (?:youtube[.]com/embed/|youtu[.]be/) # Mandatory domain name (w/ query string in .com)
+   ([^&]{11})                               # Video id of 11 characters as capture group 1
+    ~x';
+    return (preg_match($rx, $url) === 1) ? $url : '';
+};
+
+$iframeRule = array(
+    'iframe' => array(
+        'src' => $urlFilter,
+        'width',
+        'height',
+        'frameborder',
+        'allowfullscreen'
+    )
+);
+
+$filter->loadHTML($html);
+$filter->clean();
+var_dump($filter->outputHtml());
+```
+Result:
+```html
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen=""/>
+<iframe width="560" height="315" src="" frameborder="0" allowfullscreen=""/>
+
 ```
 
 ### Default Filter Configuration
