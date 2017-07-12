@@ -1,8 +1,15 @@
 <?php
-/**
- * User: lincanbin
- * Date: 2017/6/9
- * Time: 11:35
+/*
+ * White HTML Filter
+ * https://github.com/lincanbin/White-HTML-Filter
+ *
+ * Copyright 2017 Canbin Lin (lincanbin@hotmail.com)
+ * http://www.94cb.com/
+ *
+ * Licensed under the Apache License, Version 2.0:
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * A php-based HTML tag and attribute whitelist filter.
  */
 
 namespace lincanbin;
