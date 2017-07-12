@@ -21,6 +21,7 @@ class WhiteHTMLFilter
 {
     public $config;
     private $dom = NULL;
+    public $removedTags;
 
     public function __construct()
     {
@@ -174,12 +175,10 @@ class WhiteHTMLFilter
      * Recursivly remove elements from the DOM that aren't whitelisted
      * @param DOMElement $elem
      * @param boolean $isFirstNode
-     * @return array List of elements removed from the DOM
      * @throws Exception If removal of a node failed than an exception is thrown
      */
     private function cleanNodes(DOMElement $elem, $isFirstNode = false)
     {
-        $removed = array();
         if ($isFirstNode || array_key_exists(strtolower($elem->nodeName), $this->config->WhiteListTag)) {
             if ($elem->hasAttributes()) {
                 $this->cleanAttributes($elem);
@@ -194,7 +193,7 @@ class WhiteHTMLFilter
                 while (--$index >= 0) {
                     $cleanNode = $children->item($index);// DOMElement or DOMText
                     if ($cleanNode instanceof DOMElement) {
-                        $removed = array_merge($removed, $this->cleanNodes($cleanNode));
+                        $this->cleanNodes($cleanNode);
                     }
                 }
             }
@@ -206,12 +205,11 @@ class WhiteHTMLFilter
                 $result = $elem->parentNode->removeChild($elem);
             }
             if ($result) {
-                $removed[] = $elem;
+                $this->removedTags[] = $elem->nodeName;
             } else {
                 throw new Exception('Failed to remove node from DOM');
             }
         }
-        return ($removed);
     }
 
     /**
@@ -220,10 +218,12 @@ class WhiteHTMLFilter
      */
     public function clean()
     {
+        $this->removedTags = array();
         $elem = $this->dom->getElementsByTagName('body')->item(0);
         if (is_null($elem)) {
             return array();
         }
-        return $this->cleanNodes($elem, true);
+        $this->cleanNodes($elem, true);
+        return $this->removedTags;
     }
 }
