@@ -110,7 +110,7 @@ $filter->config->WhiteListCssClass = array(
 );
 ```
 
-### Use Custom Filter
+### Use Custom Attribute Value Filter
 ```php
 use lincanbin\WhiteHTMLFilter;
 
@@ -146,8 +146,8 @@ var_dump($filter->outputHtml());
 ```
 Result:
 ```html
-<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen=""/>
-<iframe width="560" height="315" src="" frameborder="0" allowfullscreen=""/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen=""></iframe>
+<iframe width="560" height="315" src="" frameborder="0" allowfullscreen=""></iframe>
 
 ```
 
