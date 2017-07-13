@@ -146,7 +146,7 @@ class WhiteHTMLFilter
                 }
             } else {
                 if (!in_array($nodeName, $this->emptyElementList) && !$this->isValidText($textContent)) {
-                    $elem->textContent = $this->tempContent;
+                    $elem->nodeValue = $this->tempContent;
                 }
             }
         } else {
