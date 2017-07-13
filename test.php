@@ -171,7 +171,7 @@ function test($input, $assert)
         echo $elem . "\n";
     }
 
-    if (str_replace("    ", "", str_replace("\n", "", $result)) === str_replace("\n", "", $assert)) {
+    if (delete_empty_char($result) === delete_empty_char($assert)) {
         echo "\n\033[32m passed $timeCost ms\033[0m\n";
         $passed++;
     } else {
@@ -179,4 +179,11 @@ function test($input, $assert)
         $failed++;
     }
     echo "\n\033[33m -------------------------------------------------------- \033[0m\n\n\n\n";
+}
+
+function delete_empty_char($string)
+{
+    $search = array("> </","　", "\n", "\r", "\t");
+    $replace = array("></", "", "", "", "");
+    return str_replace($search, $replace, $string);
 }

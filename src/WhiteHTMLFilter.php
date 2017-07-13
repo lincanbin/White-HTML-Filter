@@ -143,7 +143,11 @@ class WhiteHTMLFilter
                 }
             } else {
                 if (!in_array($nodeName, $this->emptyElementList) && !$this->isValidText($textContent)) {
-                    $elem->textContent = "\n";
+                    if (version_compare(PHP_VERSION, '5.6.0') >= 0) {
+                        $elem->textContent = "\n";
+                    } else {
+                        $elem->textContent = " ";
+                    }
                 }
             }
         } else {
