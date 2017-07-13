@@ -53,13 +53,15 @@ if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
 //User filer
 test(
     '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen></iframe>',
-    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen=""/>'
+    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen="">
+</iframe>'
 );
 
 //User filer
 test(
     '<iframe width="560" height="315" src="https://www.94cb.com/" frameborder="0" allowfullscreen></iframe>',
-    '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen=""/>'
+    '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen="">
+</iframe>'
 );
 
 //Tag filter
@@ -128,6 +130,15 @@ test(
     '<div class="">username: lincanbin  Login</div>'
 );
 
+
+//Unclosed tag
+test(
+    '<div class="">content</div><div>',
+    '<div class="">content</div><div>
+</div>'
+);
+
+
 echo "\n\n\033[32m $passed passed \033[0m\n\n";
 
 if ($failed === 0) {
@@ -157,7 +168,7 @@ function test($input, $assert)
 
     echo "\n\nremoved nodes: \n";
     foreach ($removedNodes as $elem) {
-        var_dump($elem->nodeName);
+        echo $elem . "\n";
     }
 
     if (str_replace("    ", "", str_replace("\n", "", $result)) === str_replace("\n", "", $assert)) {
