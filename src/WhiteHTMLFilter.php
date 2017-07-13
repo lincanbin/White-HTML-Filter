@@ -28,6 +28,7 @@ class WhiteHTMLFilter
 {
     public $config;
     private $dom = NULL;
+    private $tempContent;
     public $removedTags;
     /**
      * The empty elements in HTML
@@ -51,6 +52,7 @@ class WhiteHTMLFilter
         $this->dom->preserveWhiteSpace = true;
         $this->dom->formatOutput = false;
         $this->dom->encoding = 'UTF-8';
+        $this->tempContent = 'a7c598c8-fcb7-4bde-af9c-91c6515fbf7a-lincanbin-' . md5(mt_rand());
         //Disable libxml errors
         libxml_use_internal_errors(true);
     }
@@ -98,6 +100,7 @@ class WhiteHTMLFilter
             $result = trim($this->dom->saveXML());
             $result = mb_convert_encoding($result, "UTF-8", 'HTML-ENTITIES');
             $result = strip_tags($result, $allowTagsString);
+            $result = str_replace($this->tempContent, '', $result);
         }
         return $result;
     }
@@ -143,11 +146,7 @@ class WhiteHTMLFilter
                 }
             } else {
                 if (!in_array($nodeName, $this->emptyElementList) && !$this->isValidText($textContent)) {
-                    if (version_compare(PHP_VERSION, '5.6.0') >= 0) {
-                        $elem->textContent = "\n";
-                    } else {
-                        $elem->textContent = " ";
-                    }
+                    $elem->textContent = $this->tempContent;
                 }
             }
         } else {

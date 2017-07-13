@@ -183,7 +183,7 @@ function test($input, $assert)
 
 function delete_empty_char($string)
 {
-    $search = array("> </","　", "\n", "\r", "\t");
-    $replace = array("></", "", "", "", "");
+    $search = array("　", "\n", "\r", "\t");
+    $replace = array("", "", "", "");
     return str_replace($search, $replace, $string);
 }
