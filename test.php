@@ -41,11 +41,12 @@ $filter->config->modifyTagWhiteList($iframeRule);
 
 //No filter
 // PHP 5.4+
+// Chinese
 if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
     test(
         '<div class="contain"><span style="color: #f00;"><p>test中文</p>
 <br/><br>line2</span></div>',
-        '<div class="contain"><span style="color:#f00;"><p>test中文</p>
+        '<div class="contain"><span style="color:#f00;"><p>test&#x4E2D;&#x6587;</p>
 <br/><br/>line2</span></div>');
 }
 
@@ -139,6 +140,11 @@ test(
 );
 
 
+//HTML with entity
+test(
+    '<pre class="brush:html;toolbar:false">&lt;div class=&quot;form&quot;&gt;&lt;form action=&quot;login&quot; method=&quot;post&quot;&gt;username: lincanbin  &lt;button&gt;Login&lt;/button&gt;&lt;/form&gt;&lt;/div&gt;</pre>',
+    '<pre class="">&lt;div class="form"&gt;&lt;form action="login" method="post"&gt;username: lincanbin  &lt;button&gt;Login&lt;/button&gt;&lt;/form&gt;&lt;/div&gt;</pre>'
+);
 echo "\n\n\033[32m $passed passed \033[0m\n\n";
 
 if ($failed === 0) {
