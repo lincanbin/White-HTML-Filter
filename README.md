@@ -20,7 +20,7 @@ Or edit your project's `composer.json` to require `lincanbin/white-html-filter` 
 
 ```json
 "require": {
-    "lincanbin/white-html-filter": "*.*"
+    "lincanbin/white-html-filter": "~1.0"
 }
 ```
 
