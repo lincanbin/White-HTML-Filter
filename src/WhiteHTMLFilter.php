@@ -26,6 +26,7 @@ use \Closure;
  */
 class WhiteHTMLFilter
 {
+    const PARENT_TAG_NAME = "lincanbin";
     public $config;
     private $dom = NULL;
     private $tempContent;
@@ -78,7 +79,7 @@ class WhiteHTMLFilter
         if (version_compare(PHP_VERSION, '5.4.0') < 0) {
             return $this->dom->loadHTML($html);
         } else {
-            return $this->dom->loadHTML('<?xml encoding="utf-8" ?><body>' . $html . '<body>', LIBXML_HTML_NODEFDTD);
+            return $this->dom->loadHTML('<?xml encoding="utf-8" ?><' . self::PARENT_TAG_NAME . '>' . $html . '</' . self::PARENT_TAG_NAME . '>', LIBXML_HTML_NODEFDTD);
         }
 
     }
@@ -252,6 +253,6 @@ class WhiteHTMLFilter
 
     public function getRealElement()
     {
-        return $this->dom->getElementsByTagName('body')->item(0);
+        return $this->dom->getElementsByTagName(self::PARENT_TAG_NAME)->item(0);
     }
 }
