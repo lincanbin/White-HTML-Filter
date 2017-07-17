@@ -76,10 +76,11 @@ class WhiteHTMLFilter
     {
         //$html = mb_convert_encoding($html, 'HTML-ENTITIES', "UTF-8");
         $html = str_replace(chr(13), '', $html);
+        $html = '<?xml encoding="utf-8" ?><' . self::PARENT_TAG_NAME . '>' . $html . '</' . self::PARENT_TAG_NAME . '>';
         if (version_compare(PHP_VERSION, '5.4.0') < 0) {
             return $this->dom->loadHTML($html);
         } else {
-            return $this->dom->loadHTML('<?xml encoding="utf-8" ?><' . self::PARENT_TAG_NAME . '>' . $html . '</' . self::PARENT_TAG_NAME . '>', LIBXML_HTML_NODEFDTD);
+            return $this->dom->loadHTML($html, LIBXML_HTML_NODEFDTD);
         }
 
     }
