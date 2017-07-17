@@ -78,7 +78,7 @@ class WhiteHTMLFilter
         if (version_compare(PHP_VERSION, '5.4.0') < 0) {
             return $this->dom->loadHTML($html);
         } else {
-            return $this->dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NODEFDTD);
+            return $this->dom->loadHTML('<?xml encoding="utf-8" ?><body>' . $html . '<body>', LIBXML_HTML_NODEFDTD);
         }
 
     }
@@ -97,7 +97,7 @@ class WhiteHTMLFilter
             $allowTagsString = implode('', array_map($generateTag, array_keys($this->config->WhiteListTag)));
             //SaveXML : <br/><img/>
             //SaveHTML: <br><img>
-            $result = trim($this->dom->saveXML());
+            $result = trim($this->dom->saveXML($this->getRealElement()));
             //$result = mb_convert_encoding($result, "UTF-8", 'HTML-ENTITIES');
             $result = strip_tags($result, $allowTagsString);
             $result = str_replace($this->tempContent, '', $result);
@@ -242,11 +242,16 @@ class WhiteHTMLFilter
     public function clean()
     {
         $this->removedTags = array();
-        $elem = $this->dom->getElementsByTagName('body')->item(0);
+        $elem = $this->getRealElement();
         if (is_null($elem)) {
             return array();
         }
         $this->cleanNodes($elem, true);
         return $this->removedTags;
+    }
+
+    public function getRealElement()
+    {
+        return $this->dom->getElementsByTagName('body')->item(0);
     }
 }
