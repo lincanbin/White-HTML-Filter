@@ -153,6 +153,14 @@ test(
     '<pre class="brush:html;toolbar:false">&lt;div class=&quot;form&quot;&gt;&lt;form action=&quot;login&quot; method=&quot;post&quot;&gt;username: lincanbin  &lt;button&gt;Login&lt;/button&gt;&lt;/form&gt;&lt;/div&gt;</pre>',
     '<pre class="">&lt;div class="form"&gt;&lt;form action="login" method="post"&gt;username: lincanbin  &lt;button&gt;Login&lt;/button&gt;&lt;/form&gt;&lt;/div&gt;</pre>'
 );
+
+
+//HTML with comment
+test(
+    '<div class="">content<!--here is comment--></div>',
+    '<div class="">content<!--here is comment--></div>'
+);
+
 echo "\n\n\033[32m $passed passed \033[0m\n\n";
 
 if ($failed === 0) {
