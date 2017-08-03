@@ -82,7 +82,7 @@ class WhiteHTMLFilter
         $html = str_replace(chr(13), '', $html);
         $html = '<?xml version="1.0" encoding="utf-8" ?><' . $this->PARENT_TAG_NAME . '>' . $html . '</' . $this->PARENT_TAG_NAME . '>';
         if (defined('LIBXML_HTML_NODEFDTD')) {
-            return $this->dom->loadHTML($html);
+            return $this->dom->loadHTML($html, LIBXML_HTML_NODEFDTD);
         } else {
             return $this->dom->loadHTML($html);
         }
