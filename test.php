@@ -46,6 +46,11 @@ $filter->config->modifyTagWhiteList($iframeRule);
 // Chinese
 if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
     test(
+        'emoji: 😍',
+        'emoji: 😍'
+    );
+
+    test(
         'Plain text.',
         'Plain text.'
     );

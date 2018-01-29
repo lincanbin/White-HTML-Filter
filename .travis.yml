@@ -1,12 +1,19 @@
 language: php
 php:
-  - '5.3.3'
   - '5.4'
   - '5.5'
   - '5.6'
   - '7.0'
   - '7.1'
+  - '7.2'
   - nightly
+#   - hhvm
+
+# https://docs.travis-ci.com/user/reference/trusty#PHP-images
+matrix:
+  include:
+    - php: 5.3.3
+      dist: precise
 
 before_script:
   - chmod 777 -R ./
