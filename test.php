@@ -23,7 +23,7 @@ $urlFilter = function($url) {
    (?:youtube[.]com/embed/|youtu[.]be/) # Mandatory domain name (w/ query string in .com)
    ([^&]{11})                               # Video id of 11 characters as capture group 1
     ~x';
-    return (preg_match($regex, $url) === 1) ? $url : '';
+    return (preg_match($regex, $url) === 1) ? $url : false; // false means delete this attribute
 };
 
 $iframeRule = array(
@@ -66,15 +66,15 @@ if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
 
 //User filer
 test(
-    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen></iframe>',
-    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo" frameborder="0" allowfullscreen="">
+    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>',
+    '<iframe width="560" height="315" src="https://www.youtube.com/embed/lBOwxXxesBo?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen="">
 </iframe>'
 );
 
 //User filer
 test(
     '<iframe width="560" height="315" src="https://www.94cb.com/" frameborder="0" allowfullscreen></iframe>',
-    '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen="">
+    '<iframe width="560" height="315" frameborder="0" allowfullscreen="">
 </iframe>'
 );
 
@@ -89,7 +89,7 @@ test(
 );
 test(
     '<IMG SRC=javascript:alert(\'XSS\')>',
-    '<img src=""/>'
+    '<img/>'
 );
 
 //Unclosed tag filter
@@ -134,8 +134,8 @@ test(
 
 //Url filter
 test(
-    '<a href="JavaScript:alert("xss");">link</a>',
-    '<a href="">link</a>'
+    '<a href="JavaScript:alert("customAttr="xxx"");">link</a>',
+    '<a>link</a>'
 );
 
 //Invalid tag with text content filter
