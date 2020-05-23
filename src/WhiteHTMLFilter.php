@@ -203,7 +203,7 @@ class WhiteHTMLFilter
             $attrName = strtolower($domAttr->name);
             $attrValue = $domAttr->value;
             // 如果不在白名单attr中，而且允许data-*，且不是data-*，则删除
-            if (!in_array($attrName, $attributesWhiteList) && $allowDataAttribute && (stripos($attrName, "data-") !== 0)) {
+            if (!in_array($attrName, $attributesWhiteList) && (!$allowDataAttribute || stripos($attrName, "data-") === false)) {
                 $elem->removeAttribute($attrName);
             } else {
                 if (isset($attributesFilterMap[$attrName])) {
