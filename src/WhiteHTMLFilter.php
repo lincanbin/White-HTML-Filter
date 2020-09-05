@@ -130,31 +130,39 @@ class WhiteHTMLFilter
     {
         $nodeName = strtolower($elem->nodeName);
         $textContent = $elem->textContent;
+        /*
+         * Firstly iterate over the element's children. The reason we go backwards is because
+         * going forwards will cause indexes to change when elements get removed
+         */
+        if ($elem->hasChildNodes()) {
+            $children = $elem->childNodes;
+            $index = $children->length;
+            while (--$index >= 0) {
+                $cleanNode = $children->item($index);// DOMElement or DOMText
+                if ($cleanNode instanceof DOMElement) {
+                    $this->cleanNodes($cleanNode);
+                }
+            }
+        } else {
+            if (!in_array($nodeName, $this->emptyElementList) && !$this->isValidText($textContent)) {
+                $elem->nodeValue = $this->TEMP_CONTENT;
+            }
+        }
+        // process current node
         if ($isFirstNode || array_key_exists($nodeName, $this->config->WhiteListTag)) {
             if ($elem->hasAttributes()) {
                 $this->cleanAttributes($elem);
             }
-            /*
-             * Iterate over the element's children. The reason we go backwards is because
-             * going forwards will cause indexes to change when elements get removed
-             */
-            if ($elem->hasChildNodes()) {
-                $children = $elem->childNodes;
-                $index = $children->length;
-                while (--$index >= 0) {
-                    $cleanNode = $children->item($index);// DOMElement or DOMText
-                    if ($cleanNode instanceof DOMElement) {
-                        $this->cleanNodes($cleanNode);
-                    }
-                }
-            } else {
-                if (!in_array($nodeName, $this->emptyElementList) && !$this->isValidText($textContent)) {
-                    $elem->nodeValue = $this->TEMP_CONTENT;
-                }
-            }
         } else {
-            if ($this->config->KeepText === true && $this->isValidText($textContent)) {
-                $result = $elem->parentNode->replaceChild($this->dom->createTextNode($textContent), $elem);
+            // getting inner html (there is no way to do it not so ugly)
+            $htmlContent = '';
+            foreach($elem->childNodes as $childNode) {
+                $htmlContent .= $this->dom->saveHTML($childNode);
+            }
+            if ($this->config->KeepText === true && $this->isValidText($htmlContent)) {
+                $fragment = $this->dom->createDocumentFragment();
+                $fragment->appendXML($htmlContent);
+                $result = $elem->parentNode->replaceChild($fragment, $elem);
             } else {
                 $result = $elem->parentNode->removeChild($elem);
             }
